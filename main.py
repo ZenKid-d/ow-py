@@ -1,6 +1,9 @@
 import requests
 import sys
 import yaml
+import gradio as gr
+
+
 
 BASE_URL = "https://api.openweathermap.org/data/2.5/weather?"
 TRANSLATE_URL = "https://translate.api.cloud.yandex.net/translate/v2/translate"
@@ -15,7 +18,9 @@ def make_request(city):
     city_translate = make_translate(city)
     params = "q=" + city_translate + "&appid=" + app_id + "&units=metric"
     r = requests.get(BASE_URL + params)
-    print("Сейчас в городе", city, "температура", str(r.json()["main"]["temp"]), "градусов")
+    #print("Сейчас в городе", city, "температура", str(r.json()["main"]["temp"]), "градусов")
+    #return "Сейчас в городе" +  city + "температура" + str(r.json()["main"]["temp"]) + "градусов"
+    return "Сейчас в городе {} температура {} градусов".format(city, r.json()["main"]["temp"])
     
 
 def read_config_yc():
@@ -30,10 +35,18 @@ def make_translate(city):
     r = requests.post(TRANSLATE_URL, headers=headers, json=params)
     return r.json()['translations'][0]['text']
 
+#city = sys.argv[1]
 
-def main():
-    city = sys.argv[1]
-    make_request(city)
+interface = gr.Interface(
+    fn=make_request,
+    inputs=["text"],
+    outputs=["text"],
+)
+
+interface.launch()
+
+#def main():
+    #make_request(city)
     
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+#    main()
